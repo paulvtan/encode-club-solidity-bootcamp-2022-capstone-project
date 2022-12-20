@@ -5,9 +5,12 @@ import {Match} from "./Match.sol";
 
 contract MatchFactory is Ownable {
     event MatchCreated(address matchAddress, address player1);
-    mapping(address => address[]) public players;
+    mapping(address => address[]) players;
+    address[] activeMatches;
 
     constructor() {}
+
+    receive() external payable {}
 
     function launchMatch(uint8 startingHand) external payable {
         address matchAddress = address(
@@ -15,6 +18,18 @@ contract MatchFactory is Ownable {
         );
         emit MatchCreated(matchAddress, msg.sender);
         players[msg.sender].push(matchAddress);
+    }
+
+    modifier onlyThisMatchFactory() {
+        require(msg.sender == address(this), "Only this match factory");
+        _;
+    }
+
+    function addPlayer(
+        address player,
+        address matchAddress
+    ) external onlyThisMatchFactory {
+        players[player].push(matchAddress);
     }
 
     function getMatches() external view returns (address[] memory) {
