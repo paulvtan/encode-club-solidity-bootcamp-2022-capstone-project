@@ -20,15 +20,7 @@ contract MatchFactory is Ownable {
         players[msg.sender].push(matchAddress);
     }
 
-    modifier onlyThisMatchFactory() {
-        require(msg.sender == address(this), "Only this match factory");
-        _;
-    }
-
-    function addPlayer(
-        address player,
-        address matchAddress
-    ) external onlyThisMatchFactory {
+    function addPlayer(address player, address matchAddress) external {
         players[player].push(matchAddress);
     }
 

@@ -57,4 +57,46 @@ describe("MatchFactory", async () => {
     const matchCount = await matchFactoryContract.getMatchCount()
     expect(matchCount).to.equal(2)
   })
+  it("should return the same match history for both player1 and player 2", async () => {
+    const wager = ethers.utils.parseEther("1")
+    await matchFactoryContract.launchMatch(Hand.ROCK, {
+      value: wager,
+    })
+    await matchFactoryContract.launchMatch(Hand.PAPER, {
+      value: wager,
+    })
+    const matchAddress1 = (await matchFactoryContract.getMatches())[0]
+    const matchContract1 = matchContractFactory.attach(matchAddress1)
+    await matchContract1.connect(accounts[1]).joinMatch(Hand.PAPER, {
+      value: wager,
+    })
+    const matchAddress2 = (await matchFactoryContract.getMatches())[1]
+    const matchContract2 = matchContractFactory.attach(matchAddress2)
+    await matchContract2.connect(accounts[1]).joinMatch(Hand.PAPER, {
+      value: wager,
+    })
+    const player1MatchHistory = await matchFactoryContract
+      .connect(accounts[0])
+      .getMatches()
+    const player2MatchHistory = await matchFactoryContract
+      .connect(accounts[1])
+      .getMatches()
+    expect(player1MatchHistory).to.deep.equal(player2MatchHistory)
+  })
+  it("should return the correct match history outcome for winner", async () => {
+    const wager = ethers.utils.parseEther("1")
+    await matchFactoryContract.launchMatch(Hand.ROCK, {
+      value: wager,
+    })
+    const matchAddress = (await matchFactoryContract.getMatches())[0]
+    const matchContract = matchContractFactory.attach(matchAddress)
+    await matchContract.connect(accounts[1]).joinMatch(Hand.PAPER, {
+      value: wager,
+    })
+    const player1MatchHistory = await matchFactoryContract
+      .connect(accounts[0])
+      .getMatches()
+    const winner = await matchContract.winner()
+    expect(accounts[1].address).to.equal(winner)
+  })
 })

@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Match is Ownable {
-    address public matchFactoryAddressOwner;
+    address payable public matchFactoryAddressOwner;
     uint256 public totalWagedAmount;
     uint8 player1Hand;
     uint8 player2Hand;
@@ -27,7 +27,7 @@ contract Match is Ownable {
                 startingHand == uint8(Hand.SCISSORS),
             "Invalid starting hand"
         );
-        matchFactoryAddressOwner = msg.sender;
+        matchFactoryAddressOwner = payable(msg.sender);
         player1 = payable(_player1);
         player1Hand = startingHand;
         totalWagedAmount = msg.value;
@@ -57,6 +57,10 @@ contract Match is Ownable {
                 Strings.toString(totalWagedAmount / 1 ether)
             )
         );
+        MatchFactory matchFactoryContract = MatchFactory(
+            matchFactoryAddressOwner
+        );
+        matchFactoryContract.addPlayer(msg.sender, address(this));
         player2 = payable(msg.sender);
         player2Hand = hand;
         totalWagedAmount += msg.value;
