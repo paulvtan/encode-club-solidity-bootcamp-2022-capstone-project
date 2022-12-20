@@ -20,7 +20,7 @@ contract MatchFactory is Ownable {
                 startingHand == uint8(Hand.SCISSORS),
             "Invalid starting hand"
         );
-        require(msg.value > 0, "Waged amount must be greater than 0");
+        require(msg.value > 0, "Wager must be greater than 0");
         address matchAddress = address(new Match(startingHand));
         emit MatchCreated(matchAddress, msg.sender);
     }
