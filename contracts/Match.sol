@@ -10,8 +10,20 @@ contract Match {
     address payable player2;
     address payable winner;
 
+    enum Hand {
+        ROCK,
+        PAPER,
+        SCISSORS
+    }
+
     constructor(uint8 startingHand) payable {
-        require(msg.value > 0, "Waged amount must be greater than 0");
+        require(msg.value > 0, "Wager must be greater than 0");
+        require(
+            startingHand == uint8(Hand.ROCK) ||
+                startingHand == uint8(Hand.PAPER) ||
+                startingHand == uint8(Hand.SCISSORS),
+            "Invalid starting hand"
+        );
         player1 = payable(msg.sender);
         player1Hand = startingHand;
         totalwagedAmount = msg.value;
@@ -22,10 +34,11 @@ contract Match {
     }
 
     function play(uint8 hand) external payable {
+        require(msg.sender != player1, "Player 1 cannot play");
         require(
-            hand == uint8(MatchFactory.Hand.ROCK) ||
-                hand == uint8(MatchFactory.Hand.PAPER) ||
-                hand == uint8(MatchFactory.Hand.SCISSORS),
+            hand == uint8(Hand.ROCK) ||
+                hand == uint8(Hand.PAPER) ||
+                hand == uint8(Hand.SCISSORS),
             "Invalid hand"
         );
         require(
@@ -40,12 +53,12 @@ contract Match {
             require(p1Sent, "Failed to send Ether");
             require(p2Sent, "Failed to send Ether");
         } else if (
-            (player1Hand == uint8(MatchFactory.Hand.ROCK) &&
-                player2Hand == uint8(MatchFactory.Hand.SCISSORS)) ||
-            (player1Hand == uint8(MatchFactory.Hand.PAPER) &&
-                player2Hand == uint8(MatchFactory.Hand.ROCK)) ||
-            (player1Hand == uint8(MatchFactory.Hand.SCISSORS) &&
-                player2Hand == uint8(MatchFactory.Hand.PAPER))
+            (player1Hand == uint8(Hand.ROCK) &&
+                player2Hand == uint8(Hand.SCISSORS)) ||
+            (player1Hand == uint8(Hand.PAPER) &&
+                player2Hand == uint8(Hand.ROCK)) ||
+            (player1Hand == uint8(Hand.SCISSORS) &&
+                player2Hand == uint8(Hand.PAPER))
         ) {
             winner = player1;
         } else {

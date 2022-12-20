@@ -5,23 +5,23 @@ import {Match} from "./Match.sol";
 
 contract MatchFactory is Ownable {
     event MatchCreated(address matchAddress, address player1);
-    enum Hand {
-        ROCK,
-        PAPER,
-        SCISSORS
-    }
+    mapping(address => address[]) public players;
 
     constructor() {}
 
     function launchMatch(uint8 startingHand) external payable {
-        require(
-            startingHand == uint8(Hand.ROCK) ||
-                startingHand == uint8(Hand.PAPER) ||
-                startingHand == uint8(Hand.SCISSORS),
-            "Invalid starting hand"
+        address matchAddress = address(
+            new Match{value: msg.value}(startingHand)
         );
-        require(msg.value > 0, "Wager must be greater than 0");
-        address matchAddress = address(new Match(startingHand));
         emit MatchCreated(matchAddress, msg.sender);
+        players[msg.sender].push(matchAddress);
+    }
+
+    function getMatches() external view returns (address[] memory) {
+        return players[msg.sender];
+    }
+
+    function getMatchCount() external view returns (uint256) {
+        return players[msg.sender].length;
     }
 }
