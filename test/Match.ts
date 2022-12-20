@@ -27,7 +27,9 @@ describe("Match", async () => {
     await matchFactoryContract.launchMatch(Hand.ROCK, {
       value: wager,
     })
-    const matchContractAddress = (await matchFactoryContract.getMatches())[0]
+    const matchContractAddress = (
+      await matchFactoryContract.getMatchHistory()
+    )[0]
     matchContract = matchContractFactory.attach(matchContractAddress)
   })
 
@@ -47,7 +49,9 @@ describe("Match", async () => {
     ).to.be.revertedWith("Match: Player 1 already joined")
   })
   it("should have the correct player2", async () => {
-    const matchContractAddress = (await matchFactoryContract.getMatches())[0]
+    const matchContractAddress = (
+      await matchFactoryContract.getMatchHistory()
+    )[0]
     matchContract = matchContractFactory.attach(matchContractAddress)
     await matchContract
       .connect(accounts[1])

@@ -24,7 +24,7 @@ contract MatchFactory is Ownable {
         players[player].push(matchAddress);
     }
 
-    function getMatches() external view returns (address[] memory) {
+    function getMatchHistory() external view returns (address[] memory) {
         return players[msg.sender];
     }
 
