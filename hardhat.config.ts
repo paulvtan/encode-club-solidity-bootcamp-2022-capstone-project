@@ -97,7 +97,7 @@ task("getMatchHistory", "Gets the match history", async ({ account }) => {
     const [player1, player2, totalWagedAmount, winner] = await Promise.all([
       matchContract.player1(),
       matchContract.player2(),
-      matchContract.totalWagedAmount(),
+      matchContract.totalWagerAmount(),
       matchContract.winner(),
     ])
     Matches.push({

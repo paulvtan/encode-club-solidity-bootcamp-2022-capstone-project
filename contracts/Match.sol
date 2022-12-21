@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Match is Ownable {
     address payable public matchFactoryAddressOwner;
-    uint256 public totalWagedAmount;
+    uint256 public totalWagerAmount;
     uint8 player1Hand;
     uint8 player2Hand;
     address payable public player1;
@@ -30,7 +30,7 @@ contract Match is Ownable {
         matchFactoryAddressOwner = payable(msg.sender);
         player1 = payable(_player1);
         player1Hand = startingHand;
-        totalWagedAmount = msg.value;
+        totalWagerAmount = msg.value;
     }
 
     receive() external payable {}
@@ -51,10 +51,10 @@ contract Match is Ownable {
         string
             memory ErrorMessage = "Match: Waged amount must be equal to player1 waged amount of ";
         require(
-            msg.value == totalWagedAmount,
+            msg.value == totalWagerAmount,
             string.concat(
                 ErrorMessage,
-                Strings.toString(totalWagedAmount / 1 ether)
+                Strings.toString(totalWagerAmount / 1 ether)
             )
         );
         MatchFactory matchFactoryContract = MatchFactory(
@@ -63,10 +63,10 @@ contract Match is Ownable {
         matchFactoryContract.addPlayer(msg.sender, address(this));
         player2 = payable(msg.sender);
         player2Hand = hand;
-        totalWagedAmount += msg.value;
+        totalWagerAmount += msg.value;
         if (player1Hand == player2Hand) {
-            bool p1Sent = player1.send(totalWagedAmount / 2);
-            bool p2Sent = player2.send(totalWagedAmount / 2);
+            bool p1Sent = player1.send(totalWagerAmount / 2);
+            bool p2Sent = player2.send(totalWagerAmount / 2);
             require(p1Sent, "Match: Failed to send funds to player 1");
             require(p2Sent, "Match: Failed to send funds to player 2");
             winner = payable(address(0));
@@ -79,11 +79,11 @@ contract Match is Ownable {
                 player2Hand == uint8(Hand.PAPER))
         ) {
             winner = player1;
-            bool p1Sent = player1.send(totalWagedAmount);
+            bool p1Sent = player1.send(totalWagerAmount);
             require(p1Sent, "Match: Failed to send funds to player 1");
         } else {
             winner = payable(player2);
-            bool p2Sent = player2.send(totalWagedAmount);
+            bool p2Sent = player2.send(totalWagerAmount);
             require(p2Sent, "Match: Failed to send funds to player 2");
         }
     }
