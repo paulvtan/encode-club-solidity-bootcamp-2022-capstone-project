@@ -1,40 +1,35 @@
-<nav class="navbar navbar-expand-lg bg-light">
-  <div class="container-fluid">
+<div *ngIf="account">
+  <nav class="navbar navbar-expand-lg bg-light">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">
-        <img
-          src="./../assets/logo.png"
-          alt="Logo"
-          width="30"
-          class="d-inline-block align-text-top"
-        />
-        Gesture Strike
-      </a>
+      <div class="container-fluid color-font">Gesture Strike</div>
+      <div class="d-flex">
+        <h4>
+          <span class="badge bg-light text-dark">{{
+            this.accountAddress
+          }}</span>
+        </h4>
+        <h4>
+          <span class="badge rounded-pill bg-primary"
+            >⟠ {{ this.accountBalance }}</span
+          >
+        </h4>
+      </div>
     </div>
-    <div class="d-flex">
-      <h4>
-        <span class="badge bg-light text-dark">{{ this.accountAddress }}</span>
-      </h4>
-      <h4>
-        <span class="badge rounded-pill bg-primary"
-          >⟠ {{ this.accountBalance }}</span
-        >
-      </h4>
-    </div>
-  </div>
-</nav>
+  </nav>
+</div>
 <div class="container py-3">
-  <div class="px-4 py-3 my-3 text-center">
+  <div class="px-4 text-center">
     <div *ngIf="!account; else loggedIn">
+      <h1 class="display-5 py-3 fw-bold color-font-landing-page">
+        Gesture Strike
+      </h1>
+      <p class="lead mb-4">Rock, Paper, Scissors Battle on the Blockchain</p>
       <img
         class="d-block mx-auto mb-4"
         src="../assets/metamask.svg"
         alt="meta mask icon"
-        width="100"
-        height="100"
+        width="80"
       />
-      <h1 class="display-5 py-3 fw-bold">Gesture Strike</h1>
-      <p class="lead mb-4">Rock, Paper, Scissors Battle on the Blockchain</p>
       <div class="col-lg-6 mx-auto">
         <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
           <button
@@ -48,11 +43,11 @@
       </div>
     </div>
     <ng-template #loggedIn>
+      <h1 class="game-title">Active Matches</h1>
       <div *ngIf="this.activeMatches.length === 0; else activeMatchesLive">
-        <div class="m-4">No active matches</div>
+        <div class="m-4 game-title">Loading... (Or no active matches)</div>
       </div>
       <ng-template #activeMatchesLive>
-        <h1>Active Matches</h1>
         <div>
           <table class="table table-striped" *ngIf="activeMatches.length !== 0">
             <thead>
@@ -211,7 +206,7 @@
       </div>
       <!-- /// -->
       <div class="m-5">
-        <h1>My Match History</h1>
+        <h1 class="game-title">My Match History</h1>
       </div>
       <!-- Match History -->
       <table class="table table-striped" *ngIf="matchHistory.length !== 0">
@@ -247,7 +242,7 @@
             <td>
               <h5>
                 <div *ngIf="getWinner(match) === 'Tie'">
-                  <span class="badge bg-warning">⟠ Refunded</span>
+                  <span class="badge bg-secondary">⟠ 0</span>
                 </div>
                 <div *ngIf="getWinner(match) === 'You'">
                   <span class="badge bg-success"
