@@ -46,9 +46,9 @@ export class AppComponent {
         environment.matchFactoryContractAddress,
         MatchFactory.abi
       )
-      this.getActiveMatches()
-      this.getMatchHistory()
       this.getPlayerBalance()
+      this.getActiveMatches()
+      this.getLastMatchHistory()
       this.accountAddress = await this.account.getAddress()
     })
   }
@@ -67,7 +67,11 @@ export class AppComponent {
       (activeMatchAddresses: string[]) => {
         this.activeMatches = []
         activeMatchAddresses.forEach(async (matchAddress) => {
-          this.getMatch(matchAddress)
+          this.getMatch(matchAddress).then((match) => {
+            if (match) {
+              this.activeMatches.unshift(match)
+            }
+          })
         })
       }
     )
@@ -78,9 +82,29 @@ export class AppComponent {
     if (!this.account) return
     await this.matchFactoryContract['getMatchHistory']().then(
       (matchHistory: string[]) => {
+        console.log(matchHistory)
         this.matchHistory = []
         matchHistory.forEach(async (matchAddress) => {
-          this.getMatch(matchAddress, true)
+          this.getMatch(matchAddress, true).then((match) => {
+            if (match) {
+              this.matchHistory.unshift(match)
+            }
+          })
+        })
+      }
+    )
+  }
+
+  async getLastMatchHistory() {
+    if (!this.matchFactoryContract) return
+    if (!this.account) return
+    await this.matchFactoryContract['getLatestMatch']().then(
+      (matchHistory: string) => {
+        this.matchHistory = []
+        this.getMatch(matchHistory, true).then((match) => {
+          if (match) {
+            this.matchHistory.unshift(match)
+          }
         })
       }
     )
@@ -107,12 +131,7 @@ export class AppComponent {
       player2,
       winner,
     }
-    console.log('match', match)
-    if (isHistory) {
-      this.matchHistory.unshift(match)
-    } else {
-      this.activeMatches.unshift(match)
-    }
+    return match
   }
 
   formatPlayerAddress(name: string) {
@@ -142,9 +161,9 @@ export class AppComponent {
         tx.wait().then((receipt) => {
           console.log('receipt', receipt)
           this.isSendingTransaction = false
-          this.getActiveMatches()
-          this.getMatchHistory()
           this.getPlayerBalance()
+          this.getActiveMatches()
+          this.getLastMatchHistory()
         })
       })
       .catch((error: any) => {
@@ -169,9 +188,9 @@ export class AppComponent {
         tx.wait().then((receipt) => {
           console.log('receipt', receipt)
           this.isSendingTransaction = false
-          this.getActiveMatches()
-          this.getMatchHistory()
           this.getPlayerBalance()
+          this.getActiveMatches()
+          this.getLastMatchHistory()
         })
       })
       .catch((error: any) => {

@@ -39,6 +39,31 @@ contract Match is Ownable {
         return address(this).balance;
     }
 
+    function getMyHand() external view returns (uint8) {
+        require(
+            msg.sender == player1 || msg.sender == player2,
+            "Match: Player not in match"
+        );
+        if (msg.sender == player1) {
+            return player1Hand;
+        } else if (msg.sender == player2) {
+            return player2Hand;
+        } else {
+            return 0;
+        }
+    }
+
+    function getWinnerHand() external view returns (uint8) {
+        require(winner != address(0), "Match: Game not finished");
+        if (winner == player1) {
+            return player1Hand;
+        } else if (winner == player2) {
+            return player2Hand;
+        } else {
+            return 0;
+        }
+    }
+
     function joinMatch(uint8 hand) external payable {
         require(msg.sender != player1, "Match: Player 1 already joined");
         require(winner == address(0), "Match full: Game already finished");

@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  matchFactoryContractAddress: '0x3964823a0F3b42533E392e02B40F867A7238902D',
+  matchFactoryContractAddress: '0x4E4EEf53aC8f18c7617e357e2A0392fa4D45a295',
 }

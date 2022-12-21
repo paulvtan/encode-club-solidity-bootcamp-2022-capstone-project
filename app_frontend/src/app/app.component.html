@@ -263,6 +263,14 @@
           </tr>
         </tbody>
       </table>
+      <button
+        [disabled]="isSendingTransaction"
+        (click)="getMatchHistory()"
+        type="button"
+        class="btn btn-secondary m-4 p-1"
+      >
+        <img src="../assets/add.png" alt="More" width="40" />
+      </button>
       <!-- /// -->
     </ng-template>
   </div>
