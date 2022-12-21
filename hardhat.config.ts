@@ -124,4 +124,14 @@ task(
 )
   .addOptionalParam("account", "The account number to use", "0")
   .addOptionalParam("address", "The address of the match contract")
+
+task("getActiveMatches", "Gets the active matches", async ({ account }) => {
+  const signer = getSigner(Number(account))
+  const matchFactoryContract = new MatchFactory__factory(signer).attach(
+    process.env.MATCH_FACTORY_CONTRACT_ADDRESS || ""
+  )
+  const activeMatches = await matchFactoryContract.getActiveMatches()
+  console.log(activeMatches)
+}).addOptionalParam("account", "The account number to use", "0")
+
 export default config
