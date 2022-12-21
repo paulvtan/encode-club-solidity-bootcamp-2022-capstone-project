@@ -1,0 +1,277 @@
+<div *ngIf="account">
+  <nav class="navbar navbar-expand-lg bg-light">
+    <div class="container-fluid">
+      <div class="container-fluid color-font">Gesture Strike</div>
+      <div class="d-flex">
+        <h4>
+          <span class="badge bg-light text-dark">{{
+            this.accountAddress
+          }}</span>
+        </h4>
+        <h4>
+          <span class="badge rounded-pill bg-primary"
+            >⟠ {{ this.accountBalance }}</span
+          >
+        </h4>
+      </div>
+    </div>
+  </nav>
+</div>
+<div class="container py-3">
+  <div class="px-4 text-center">
+    <div *ngIf="!account; else loggedIn">
+      <h1 class="display-5 py-3 fw-bold color-font-landing-page">
+        Gesture Strike
+      </h1>
+      <p class="lead mb-4">Rock, Paper, Scissors Battle on the Blockchain</p>
+      <img
+        class="d-block mx-auto mb-4"
+        src="../assets/metamask.svg"
+        alt="meta mask icon"
+        width="80"
+      />
+      <div class="col-lg-6 mx-auto">
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+          <button
+            (click)="connectWallet()"
+            type="button"
+            class="btn btn-outline-primary btn-lg px-4 gap-3"
+          >
+            Connnect a Wallet
+          </button>
+        </div>
+      </div>
+    </div>
+    <ng-template #loggedIn>
+      <h1 class="game-title">Active Matches</h1>
+      <div *ngIf="this.activeMatches.length === 0; else activeMatchesLive">
+        <div class="m-4 game-title">Loading... (Or no active matches)</div>
+      </div>
+      <ng-template #activeMatchesLive>
+        <div>
+          <table class="table table-striped" *ngIf="activeMatches.length !== 0">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Player 1</th>
+                <th scope="col">Wager to Match</th>
+                <th scope="col">Fight</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let match of activeMatches; index as i">
+                <th scope="row">{{ i + 1 }}</th>
+                <td>
+                  <h4>
+                    <div *ngIf="formatPlayerAddress(match.player1) === 'You'">
+                      <span class="badge bg-success mt-2">{{
+                        formatPlayerAddress(match.player1)
+                      }}</span>
+                    </div>
+                    <div *ngIf="formatPlayerAddress(match.player1) !== 'You'">
+                      <span class="badge bg-secondary mt-2">{{
+                        formatPlayerAddress(match.player1)
+                      }}</span>
+                    </div>
+                  </h4>
+                </td>
+                <td>
+                  <h5 class="mt-2">⟠ {{ match.totalWagerAmount }}</h5>
+                </td>
+                <td>
+                  <div
+                    *ngIf="
+                      !(match.player1 === this.accountAddress);
+                      else isYourHand
+                    "
+                  >
+                    <button
+                      (click)="joinMatch(match, 0)"
+                      type="button"
+                      class="btn btn-outline-success m-1"
+                    >
+                      <img src="../assets/rock.png" alt="rock" width="30" />
+                    </button>
+                    <button
+                      (click)="joinMatch(match, 1)"
+                      type="button"
+                      class="btn btn-outline-warning m-1"
+                    >
+                      <img src="../assets/paper.png" alt="paper" width="30" />
+                    </button>
+                    <button
+                      (click)="joinMatch(match, 2)"
+                      type="button"
+                      class="btn btn-outline-danger m-1"
+                    >
+                      <img
+                        src="../assets/scissors.png"
+                        alt="scissors"
+                        width="30"
+                      />
+                    </button>
+                  </div>
+                  <ng-template #isYourHand
+                    ><h5 class="mt-2">This is your hand</h5>
+                  </ng-template>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div
+            *ngIf="activeMatches.length !== 0"
+            class="d-grid gap-2 d-sm-flex justify-content-sm-center"
+          ></div>
+        </div>
+      </ng-template>
+      <!-- Modal Button -->
+      <button
+        [disabled]="isSendingTransaction"
+        type="button"
+        class="btn btn-primary m-4 w-40 p-1"
+        data-bs-toggle="modal"
+        data-bs-target="#staticBackdrop"
+      >
+        <img src="../assets/battle.png" alt="rock" width="80" />
+      </button>
+      <!-- /// -->
+      <!-- Modal -->
+      <div
+        class="modal fade"
+        id="staticBackdrop"
+        tabindex="-1"
+        aria-labelledby="staticBackdropLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content rounded-4 shadow">
+            <div class="modal-body p-5">
+              <h2 class="fw-bold mb-0">Creating a match...</h2>
+              <div class="justify-content-sm-cente py-3">
+                Place your wager amount
+              </div>
+              <div class="input-group input-group-lg mb-3">
+                <span class="input-group-text" id="basic-addon1"> ⟠ </span>
+                <input
+                  #wagerAmountId
+                  type="number"
+                  class="form-control"
+                  min="0.1"
+                  placeholder="0.1"
+                  value="0.1"
+                  step="0.1"
+                  [disabled]="isSendingTransaction"
+                />
+              </div>
+              <button
+                (click)="createMatch(0, wagerAmountId.value)"
+                type="button"
+                class="btn btn-lg btn-success m-2 px-2 w-30"
+                [disabled]="isSendingTransaction"
+              >
+                <div *ngIf="!isSendingTransaction">
+                  <img src="../assets/rock.png" alt="rock" width="80" />
+                </div>
+              </button>
+              <button
+                (click)="createMatch(1, wagerAmountId.value)"
+                type="button"
+                class="btn btn-lg btn-warning m-2 px-2 w-30"
+                [disabled]="isSendingTransaction"
+              >
+                <div *ngIf="!isSendingTransaction">
+                  <img src="../assets/paper.png" alt="paper" width="80" />
+                </div>
+              </button>
+              <button
+                (click)="createMatch(2, wagerAmountId.value)"
+                type="button"
+                class="btn btn-lg btn-danger m-2 px-2 w-30"
+                [disabled]="isSendingTransaction"
+              >
+                <div *ngIf="!isSendingTransaction">
+                  <img src="../assets/scissors.png" alt="scissors" width="80" />
+                </div>
+              </button>
+              <button
+                type="button"
+                class="btn btn-lg btn-secondary mt-3 w-100"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /// -->
+      <div class="m-5">
+        <h1 class="game-title">My Match History</h1>
+      </div>
+      <!-- Match History -->
+      <table class="table table-striped" *ngIf="matchHistory.length !== 0">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Winner</th>
+            <th scope="col">Total Wager</th>
+            <th scope="col">Your Reward</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let match of matchHistory; index as i">
+            <th scope="row">{{ i + 1 }}</th>
+            <td>
+              <h5>
+                <div *ngIf="getWinner(match) === 'Tie'">
+                  <span class="badge bg-warning">{{ getWinner(match) }}</span>
+                </div>
+                <div *ngIf="getWinner(match) === 'You'">
+                  <span class="badge bg-success">{{ getWinner(match) }}</span>
+                </div>
+                <div
+                  *ngIf="
+                    getWinner(match) !== 'You' && getWinner(match) !== 'Tie'
+                  "
+                >
+                  <span class="badge bg-danger">{{ getWinner(match) }}</span>
+                </div>
+              </h5>
+            </td>
+            <td>⟠ {{ match.totalWagerAmount }}</td>
+            <td>
+              <h5>
+                <div *ngIf="getWinner(match) === 'Tie'">
+                  <span class="badge bg-secondary">⟠ 0</span>
+                </div>
+                <div *ngIf="getWinner(match) === 'You'">
+                  <span class="badge bg-success"
+                    >⟠ +{{ match.totalWagerAmount / 2 }}</span
+                  >
+                </div>
+                <div
+                  *ngIf="
+                    getWinner(match) !== 'You' && getWinner(match) !== 'Tie'
+                  "
+                >
+                  <span class="badge bg-danger"
+                    >⟠ -{{ match.totalWagerAmount / 2 }}</span
+                  >
+                </div>
+              </h5>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <button
+        [disabled]="isSendingTransaction"
+        (click)="getMatchHistory()"
+        type="button"
+        class="btn btn-secondary m-4 p-1"
+      >
+        <img src="../assets/add.png" alt="More" width="40" />
+      </button>
+      <!-- /// -->
+    </ng-template>
+  </div>
+</div>
