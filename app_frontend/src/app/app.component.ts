@@ -29,9 +29,11 @@ export class AppComponent {
   title = 'gesture-strike'
 
   accountAddress: string | undefined
+  accountBalance: number | undefined
   account: ethers.providers.JsonRpcSigner | undefined
   matchFactoryContract: ethers.Contract | undefined
   activeMatches: IMatch[] = []
+  matchHistory: IMatch[] = []
   isSendingTransaction = false
 
   constructor() {}
@@ -45,6 +47,8 @@ export class AppComponent {
         MatchFactory.abi
       )
       this.getActiveMatches()
+      this.getMatchHistory()
+      this.getPlayerBalance()
       this.accountAddress = await this.account.getAddress()
     })
   }
@@ -61,6 +65,7 @@ export class AppComponent {
     console.log('getting active matches')
     await this.matchFactoryContract['getActiveMatches']().then(
       (activeMatchAddresses: string[]) => {
+        this.activeMatches = []
         activeMatchAddresses.forEach(async (matchAddress) => {
           this.getMatch(matchAddress)
         })
@@ -68,9 +73,21 @@ export class AppComponent {
     )
   }
 
-  private async getMatch(matchAddress: string) {
+  async getMatchHistory() {
+    if (!this.matchFactoryContract) return
     if (!this.account) return
-    this.activeMatches = []
+    await this.matchFactoryContract['getMatchHistory']().then(
+      (matchHistory: string[]) => {
+        this.matchHistory = []
+        matchHistory.forEach(async (matchAddress) => {
+          this.getMatch(matchAddress, true)
+        })
+      }
+    )
+  }
+
+  private async getMatch(matchAddress: string, isHistory = false) {
+    if (!this.account) return
     const matchContract = new ethers.Contract(
       matchAddress,
       Match.abi,
@@ -91,13 +108,27 @@ export class AppComponent {
       winner,
     }
     console.log('match', match)
-    this.activeMatches.push(match)
+    if (isHistory) {
+      this.matchHistory.unshift(match)
+    } else {
+      this.activeMatches.unshift(match)
+    }
   }
 
   formatPlayerAddress(name: string) {
     if (!this.account) return
     if (name === this.accountAddress) return 'You'
     return name.slice(0, 7) + '...' + name.slice(-7)
+  }
+
+  getWinner(match: IMatch) {
+    if (match.winner === '0x0000000000000000000000000000000000000000') {
+      return 'Tie'
+    } else if (match.winner === this.accountAddress) {
+      return 'You'
+    } else {
+      return match.winner.slice(0, 7) + '...' + match.winner.slice(-7)
+    }
   }
 
   createMatch(hand: number, wager: string) {
@@ -112,21 +143,14 @@ export class AppComponent {
           console.log('receipt', receipt)
           this.isSendingTransaction = false
           this.getActiveMatches()
+          this.getMatchHistory()
+          this.getPlayerBalance()
         })
       })
       .catch((error: any) => {
         console.log('error', error)
         this.isSendingTransaction = false
       })
-  }
-
-  private async getPlayerBalance() {
-    if (!this.account) return
-    const balance = parseFloat(
-      ethers.utils.formatEther(await this.account.getBalance())
-    )
-    console.log('balance', balance)
-    return Math.round(balance * 100) / 100
   }
 
   joinMatch(match: IMatch, hand: number) {
@@ -146,11 +170,22 @@ export class AppComponent {
           console.log('receipt', receipt)
           this.isSendingTransaction = false
           this.getActiveMatches()
+          this.getMatchHistory()
+          this.getPlayerBalance()
         })
       })
       .catch((error: any) => {
         console.log('error', error)
         this.isSendingTransaction = false
       })
+  }
+
+  async getPlayerBalance() {
+    if (!this.account) return
+    const balance = parseFloat(
+      ethers.utils.formatEther(await this.account.getBalance())
+    )
+    console.log('balance', balance)
+    this.accountBalance = Math.round(balance * 100) / 100
   }
 }
