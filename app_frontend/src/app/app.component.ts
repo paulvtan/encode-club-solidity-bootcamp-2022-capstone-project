@@ -102,7 +102,10 @@ export class AppComponent {
       (matchHistory: string) => {
         this.matchHistory = []
         this.getMatch(matchHistory, true).then((match) => {
-          if (match) {
+          if (
+            match &&
+            match.player2 !== '0x0000000000000000000000000000000000000000'
+          ) {
             this.matchHistory.unshift(match)
           }
         })
