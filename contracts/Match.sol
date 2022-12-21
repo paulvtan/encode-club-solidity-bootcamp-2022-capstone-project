@@ -86,5 +86,6 @@ contract Match is Ownable {
             bool p2Sent = player2.send(totalWagerAmount);
             require(p2Sent, "Match: Failed to send funds to player 2");
         }
+        MatchFactory(matchFactoryAddressOwner).closeActiveMatch(address(this));
     }
 }
