@@ -9,3 +9,9 @@ Login with Metamask and create a new match.
 
 Select your gesture and submit it to the blockchain or battle against a random opponents.
 ![Screenshot](./images/matches.png)
+
+# Smart Contract
+
+`MatchFactory.sol` is the main smart contract that handles the creation of new matches and the submission of gestures. 
+
+`Match.sol` is the smart contract that handles the logic of the game and the storage of the match history. Hold and transfer the rewards to the winner.
