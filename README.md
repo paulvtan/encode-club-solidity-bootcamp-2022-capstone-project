@@ -1,13 +1,11 @@
-# Sample Hardhat Project
+# Gesture Strike
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+"Gesture Strike," a Rock, Paper, Scissors blockchain game with an on-chain match history and wagering mechanism.
 
-Try running some of the following tasks:
+# Screenshots
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.ts
-```
+Login with Metamask and create a new match.
+![Screenshot](./images/landing-page.png)
+
+Select your gesture and submit it to the blockchain or battle against a random opponents.
+![Screenshot](./images/matches.png)
